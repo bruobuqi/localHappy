@@ -1,6 +1,6 @@
 <template>
 <el-container >
-  <el-header>   <img :src="imgUrl" class="imgSize"><div class="words">个人财务管理系统</div></el-header>
+  <el-header>  <img :src="imgUrl" class="imgSize"> <div class="words">个人财务管理系统</div></el-header>
 
     <el-container>
     <el-aside width="200px">
@@ -10,15 +10,15 @@
           <el-menu
             default-active="1"
             class="el-menu-vertical-demo"
-            background-color="#EAC100"
+            background-color="#dadada"
             text-color="#fff"
-            active-text-color="#ffd04b"  @select="nihao">
+            active-text-color="#409eff"  @select="changetableMethod">
             <el-menu-item index="1">
-              <i class="el-icon-menu"></i>
+              <i class="el-icon-setting"></i>
               <span slot="title">账号管理</span>
             </el-menu-item>
             <el-menu-item index="2">
-              <i class="el-icon-menu"></i>
+              <i class="el-icon-setting"></i>
               <span slot="title">收入管理</span>
             </el-menu-item>
             <el-menu-item index="3">
@@ -26,12 +26,12 @@
               <span slot="title">支出管理</span>
             </el-menu-item>
             <el-menu-item index="4">
-              <i class="el-icon-setting"></i>
-              <span slot="title">统计查询</span>
+              <i class="el-icon-search"></i>
+              <span slot="title">理财统计</span>
             </el-menu-item>
             <el-menu-item index="5">
-              <i class="el-icon-setting"></i>
-              <span slot="title">理财统计</span>
+              <i class="el-icon-search"></i>
+              <span slot="title">图表展示</span>
             </el-menu-item>
           </el-menu>
         </el-col>
@@ -39,36 +39,64 @@
         </el-row>
     </el-aside>
     <el-main>
-       <div class="account" v-if="account">
+     
+       <div class="account" v-if="account"> 
+         <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>账号管理</el-breadcrumb-item>
+          </el-breadcrumb>
           <el-table
-          :data="tableData"
-          style="width: 100%">
-          <el-table-column
-            label="日期"
-            width="180">
-            <template slot-scope="scope">
-              <i class="el-icon-time"></i>
-              <span style="margin-left: 10px">{{ scope.row.date }}</span>
-            </template>
-          </el-table-column>
+          :data="tableData1"
+          style="width: 100%"
+          :row-class-name="tableRowClassName"
+        
+          >
           <el-table-column
             label="姓名"
             width="180">
+           <template slot-scope="scope">
+                    <el-input size="small" v-model="scope.row.name" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="账号"
+            width="180">
             <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <p>姓名: {{ scope.row.name }}</p>
-                <p>住址: {{ scope.row.address }}</p>
-                <div slot="reference" class="name-wrapper">
-                  <el-tag size="medium">{{ scope.row.name }}</el-tag>
-                </div>
-              </el-popover>
+                    <el-input size="small" v-model="scope.row.account" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+            </template>
+          </el-table-column>
+          <el-table-column
+           
+            label="密码"
+            width="180">
+            <template slot-scope="scope">
+                    <el-input size="small" v-model="scope.row.password" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+            </template>
+          </el-table-column>
+          <el-table-column
+        
+            label="地址">
+            <template slot-scope="scope">
+                    <el-input size="small" v-model="scope.row.address" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+            </template>
+          </el-table-column>
+          <el-table-column
+           
+            label="创建日期或修改日期"
+            width="180">
+            <template slot-scope="scope">
+                    <i class="el-icon-time"></i>
+                <span style="margin-left: 10px">{{ scope.row.date }}</span>
             </template>
           </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
                 size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.disable">编辑</el-button>
+                 <el-button
+                size="mini"
+                @click="handleSave(scope.$index, scope.row)" v-if="!scope.row.disable" type="primary">保存</el-button>
               <el-button
                 size="mini"
                 type="danger"
@@ -76,122 +104,206 @@
             </template>
           </el-table-column>
         </el-table>
-        </div>
+
+            
+      </div>
+ 
         <div class="income" v-if="income">
+           <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>收入管理</el-breadcrumb-item>
+          </el-breadcrumb>
           <el-table
-          :data="tableData"
+          :data="tableData2"
           style="width: 100%">
-          <el-table-column
-            label="日期"
-            width="180">
-            <template slot-scope="scope">
-              <i class="el-icon-time"></i>
-              <span style="margin-left: 10px">{{ scope.row.date }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="姓名"
-            width="180">
-            <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <p>姓名: {{ scope.row.name }}</p>
-                <p>住址: {{ scope.row.address }}</p>
-                <div slot="reference" class="name-wrapper">
-                  <el-tag size="medium">{{ scope.row.name }}</el-tag>
-                </div>
-              </el-popover>
-            </template>
-          </el-table-column>
+            <el-table-column
+              label="日期"
+              width="180">
+              <template slot-scope="scope">
+                <i class="el-icon-time"></i>
+                <span style="margin-left: 10px">{{ scope.row.date }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+              label="姓名"
+              width="180">
+             <template slot-scope="scope">
+                 <i class="el-icon-star-off"></i>
+                <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                 
+              </template>
+            </el-table-column>
+             <el-table-column
+              label="收入金额"
+              width="180">
+             <template slot-scope="scope">
+                
+                  <el-input size="small" v-model="scope.row.money" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+              </template>
+            </el-table-column>
+             <el-table-column
+              label="收入来源或者收入理由"
+              width="280">
+             <template slot-scope="scope">
+                
+                  <el-input size="small" v-model="scope.row.source" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+              </template>
+            </el-table-column>
           <el-table-column label="操作">
             <template slot-scope="scope">
               <el-button
                 size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.disable">编辑</el-button>
+                 <el-button
+                size="mini"
+                @click="handleSave(scope.$index, scope.row)" v-if="!scope.row.disable" type="primary">保存</el-button>
               <el-button
                 size="mini"
                 type="danger"
                 @click="handleDelete(scope.$index, scope.row)">删除</el-button>
             </template>
           </el-table-column>
-        </el-table>
+          </el-table>
         </div>
         <div class="expenditure" v-if="expenditure">
+             <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>支出管理</el-breadcrumb-item>
+          </el-breadcrumb>
           <el-table
-          :data="tableData"
-          style="width: 100%">
-          <el-table-column
-            label="日期"
-            width="180">
+            :data="tableData3"
+            style="width: 100%"
+            :row-class-name="tableRowClassName"
+          
+            >
+            <el-table-column
+            
+              label="日期"
+              width="180">
+              <template slot-scope="scope">
+                      <i class="el-icon-time"></i>
+                <span style="margin-left: 10px">{{ scope.row.date }}</span>
+              </template>
+            </el-table-column>
+
+            <el-table-column
+            
+              label="姓名"
+              width="180">
             <template slot-scope="scope">
-              <i class="el-icon-time"></i>
-              <span style="margin-left: 10px">{{ scope.row.date }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="姓名"
-            width="180">
-            <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <p>姓名: {{ scope.row.name }}</p>
-                <p>住址: {{ scope.row.address }}</p>
-                <div slot="reference" class="name-wrapper">
-                  <el-tag size="medium">{{ scope.row.name }}</el-tag>
-                </div>
-              </el-popover>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+                       <i class="el-icon-star-off"></i>
+                <span style="margin-left: 10px">{{ scope.row.name }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column
+          
+              label="消费金额">
+              <template slot-scope="scope">
+                      <el-input size="small" v-model="scope.row.money" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+              </template>
+            </el-table-column>
+            <el-table-column
+          
+              label="消费地址或消费原因">
+              <template slot-scope="scope">
+                      <el-input size="small" v-model="scope.row.consumerAddress" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+              </template>
+            </el-table-column>
+  
+            <el-table-column label="操作">
+              <template slot-scope="scope">
+                <el-button
+                  size="mini"
+                  @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.disable">编辑</el-button>
+                  <el-button
+                  size="mini"
+                  @click="handleSave(scope.$index, scope.row)" v-if="!scope.row.disable" type="primary">保存</el-button>
+                <el-button
+                  size="mini"
+                  type="danger"
+                  @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
         </div>
         <div class="statistical" v-if="statistical">
-          <el-table
-          :data="tableData"
-          style="width: 100%">
-          <el-table-column
-            label="日期"
-            width="180">
-            <template slot-scope="scope">
-              <i class="el-icon-time"></i>
-              <span style="margin-left: 10px">{{ scope.row.date }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="姓名"
-            width="180">
-            <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <p>姓名: {{ scope.row.name }}</p>
-                <p>住址: {{ scope.row.address }}</p>
-                <div slot="reference" class="name-wrapper">
-                  <el-tag size="medium">{{ scope.row.name }}</el-tag>
-                </div>
-              </el-popover>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item>理财统计</el-breadcrumb-item>
+          </el-breadcrumb>
+           <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="购买理财统计页面" name="first">  
+              <el-table
+                :data="tableData4"
+                style="width: 100%"
+                :row-class-name="tableRowClassName"         
+                >
+                <el-table-column
+                
+                  label="购买日期"
+                  width="180">
+                  <template slot-scope="scope">
+                          <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column               
+                  label="到期日期"
+                  width="180">
+                  <template slot-scope="scope">
+                          <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.date }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column               
+                  label="公司名称"
+                  width="180">
+                <template slot-scope="scope">
+                          <i class="el-icon-star-off"></i>
+                    <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column
+              
+                  label="购买金额">
+                  <template slot-scope="scope">
+                          <el-input size="small" v-model="scope.row.money" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+                  </template>
+                </el-table-column>
+                <el-table-column             
+                  label="预计本息和">
+                  <template slot-scope="scope">
+                          <el-input size="small" v-model="scope.row.consumerAddress" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+                  </template>
+                </el-table-column>    
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button
+                      size="mini"
+                      @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.disable">编辑</el-button>
+                      <el-button
+                      size="mini"
+                      @click="handleSave(scope.$index, scope.row)" v-if="!scope.row.disable" type="primary">保存</el-button>
+                    <el-button
+                      size="mini"
+                      type="danger"
+                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                  </template>
+                </el-table-column>
+                </el-table>
+            </el-tab-pane>
+            <el-tab-pane label="负债统计页面" name="second">
+              
+            </el-tab-pane>
+            <el-tab-pane label="图表展示页面" name="second">图表展示页面</el-tab-pane>
+              </el-tabs>
+        
         </div>
         <div class="financial" v-if="financial">
+          <el-breadcrumb separator="/">
+            <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
+            <el-breadcrumb-item> 图表展示</el-breadcrumb-item>
+          </el-breadcrumb>
           <el-table
           :data="tableData"
           style="width: 100%">
@@ -243,39 +355,202 @@
   export default {
      data () {
       return {
+        activeName: 'first',
+        dialogTableVisible: false,
+        dialogFormVisible: false,
         imgUrl:require("../assets/financial.jpg"),
         account: false,
         income: false,
         expenditure: false,
         statistical: false,
         financial: false,
-           tableData: [{
-          date: '2016-05-02',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1518 弄'
-        }, {
-          date: '2016-05-04',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1517 弄'
-        }, {
-          date: '2016-05-01',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1519 弄'
-        }, {
-          date: '2016-05-03',
-          name: '王小虎',
-          address: '上海市普陀区金沙江路 1516 弄'
+        changetable:"1",
+        tableData1: [{
+            date: '2016-05-02',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1518 弄',
+            account:"bruobuqi",
+            disable:true
+          }, {
+            date: '2016-05-04',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1517 弄',
+            account:"bruobuqi",
+            disable:true
+          }, {
+            date: '2016-05-01',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1519 弄',
+            account:"bruobuqi",
+            disable:true
+          }, {
+            date: '2016-05-03',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1516 弄',
+            account:"bruobuqi",
+            disable:true
+        }],
+        tableData2: [{
+            date: '2016-05-02',
+            name: '王小虎',
+          
+            source: '上海市普陀区金沙江路 1518 弄',
+            money:"bruobuqi",
+            disable:true
+          }, {
+            date: '2016-05-04',
+            name: '王小虎',
+            
+            source: '上海市普陀区金沙江路 1517 弄',
+            money:"bruobuqi",
+            disable:true
+          }, {
+            date: '2016-05-01',
+            name: '王小虎',
+          
+            source: '上海市普陀区金沙江路 1519 弄',
+            money:"bruobuqi",
+            disable:true
+          }, {
+            date: '2016-05-03',
+            name: '王小虎',
+           
+            source: '上海市普陀区金沙江路 1516 弄',
+            money:"bruobuqi",
+            disable:true
+        }],
+        tableData3: [{
+            date: '2016-05-02',
+            name: '王小虎',
+            pasword:'密码',
+            money: '上海市普陀区金沙江路 1518 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            date: '2016-05-04',
+            name: '王小虎',
+            pasword:'密码',
+            money: '上海市普陀区金沙江路 1517 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            date: '2016-05-01',
+            name: '王小虎',
+            pasword:'密码',
+            money: '上海市普陀区金沙江路 1519 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            date: '2016-05-03',
+            name: '王小虎',
+            pasword:'密码',
+            money: '上海市普陀区金沙江路 1516 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+        }],
+        tableData4: [{
+            date: '2016-05-02',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1518 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            date: '2016-05-04',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1517 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            date: '2016-05-01',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1519 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            date: '2016-05-03',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1516 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
         }],
       };
     },
     methods: {
-      nihao(key, keyPath) {
+      handleEdit(index, row) {
+        if(this.changetable=="1"){
+         this.tableData1[index].disable=false;
+        }
+        if(this.changetable=="2"){
+         this.tableData2[index].disable=false;
+        }
+        if(this.changetable=="3"){
+         this.tableData3[index].disable=false;
+        }
+        if(this.changetable=="4"){
+         this.tableData4[index].disable=false;
+        }
+      },
+      handleSave(index, row){
+         if(this.changetable=="1"){
+        this.tableData1[index].date=row.date;
+
+        this.tableData1[index].disable=true;
+         }
+          if(this.changetable=="2"){
+        this.tableData2[index].date=row.date;
+
+        this.tableData2[index].disable=true;
+         }
+          if(this.changetable=="3"){
+        this.tableData3[index].date=row.date;
+
+        this.tableData3[index].disable=true;
+         }
+          if(this.changetable=="4"){
+        this.tableData4[index].date=row.date;
+
+        this.tableData4[index].disable=true;
+         }
+      },
+      handleDelete(index, row) {
+         if(this.changetable=="1"){
+       this.$delete(this.tableData1,index)
+         }
+          if(this.changetable=="2"){
+       this.$delete(this.tableData2,index)
+         }
+          if(this.changetable=="3"){
+       this.$delete(this.tableData3,index)
+         }
+          if(this.changetable=="4"){
+       this.$delete(this.tableData4,index)
+         }
+      },
+       tableRowClassName({row, rowIndex}) {
+        if (rowIndex === 1) {
+          return 'warning-row';
+        } else if (rowIndex === 3) {
+          return 'success-row';
+        }
+        return '';
+      },
+      changetableMethod(key, keyPath) {
+        this.changetable=key;
         if("1"==key){
         this.account=true
         this.income= false;
         this.expenditure=false;
         this.statistical= false;
         this.financial= false;
+        
         }
          if("2"==key){
         this.account=false
@@ -306,30 +581,39 @@
         this.financial= true;
         }
       },
-       handleEdit(index, row) {
-        console.log(index, row);
-      },
-      handleDelete(index, row) {
-        console.log(index, row);
-      }
+       
 
     }
   }
 </script>
 <style scoped>
+.el-main[data-v-469af010] {
+    text-align: center;
+    line-height: 20px;
+}
+ .el-table .warning-row {
+    background: oldlace;
+  }
+
+  .el-table .success-row {
+    background: #f0f9eb;
+  }
 .words[data-v-469af010] {
     position: absolute;
     top: 7px;
-    left: 147px;
-    font-size: 30px;
+    left: 60px;
+    font-size: 20px;
+    color: blue;
+    font-family:courier
 }
  .imgSize{
-   width: auto;
-   height: 60px ;
-   margin-left: -21px;
+   width: 40px;
+   height: 40px ;
+    margin-left: -11px;
+    margin-top: 10px;
  }
- .el-header, .el-footer {
-    background-color: #EAC100;
+ .el-header {
+   background-color: #dadada;
     color: #333;
     text-align: left;
     line-height: 60px;
