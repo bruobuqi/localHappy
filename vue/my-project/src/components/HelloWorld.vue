@@ -113,6 +113,7 @@
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item>收入管理</el-breadcrumb-item>
           </el-breadcrumb>
+           <el-button  icon="el-icon-circle-plus" round @click="incomeAdd(1)">添加</el-button>
           <el-table
           :data="tableData2"
           style="width: 100%">
@@ -138,7 +139,7 @@
               width="180">
              <template slot-scope="scope">
                 
-                  <el-input size="small" v-model="scope.row.money" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+                  <el-input size="small" type='number' v-model="scope.row.money" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
               </template>
             </el-table-column>
              <el-table-column
@@ -170,6 +171,7 @@
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item>支出管理</el-breadcrumb-item>
           </el-breadcrumb>
+          <el-button  icon="el-icon-circle-plus" round @click="incomeAdd(2)">添加</el-button>
           <el-table
             :data="tableData3"
             style="width: 100%"
@@ -199,7 +201,7 @@
           
               label="消费金额">
               <template slot-scope="scope">
-                      <el-input size="small" v-model="scope.row.money" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+                      <el-input size="small" v-model="scope.row.money" placeholder="请输入消费金额" :disabled="scope.row.disable"></el-input> 
               </template>
             </el-table-column>
             <el-table-column
@@ -231,8 +233,10 @@
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item>理财统计</el-breadcrumb-item>
           </el-breadcrumb>
+            
            <el-tabs v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="购买理财统计页面" name="first">  
+              <el-button  icon="el-icon-circle-plus" round @click="incomeAdd(3)">添加</el-button>
               <el-table
                 :data="tableData4"
                 style="width: 100%"
@@ -293,9 +297,67 @@
                 </el-table>
             </el-tab-pane>
             <el-tab-pane label="负债统计页面" name="second">
+              <el-button  icon="el-icon-circle-plus" round @click="incomeAdd(4)">添加</el-button>
+                <el-table
+                :data="tableData5"
+                style="width: 100%"
+                :row-class-name="tableRowClassName"         
+                >
+                <el-table-column
+                
+                  label="借款日期"
+                  width="180">
+                  <template slot-scope="scope">
+                          <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.dateStart }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column               
+                  label="到期日期"
+                  width="180">
+                  <template slot-scope="scope">
+                          <i class="el-icon-time"></i>
+                    <span style="margin-left: 10px">{{ scope.row.dateEnd }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column               
+                  label="银行或者个人名称"
+                  width="180">
+                <template slot-scope="scope">
+                          <i class="el-icon-star-off"></i>
+                    <span style="margin-left: 10px">{{ scope.row.name }}</span>
+                  </template>
+                </el-table-column>
+                <el-table-column
               
+                  label="负债金额">
+                  <template slot-scope="scope">
+                          <el-input size="small" v-model="scope.row.money" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+                  </template>
+                </el-table-column>
+                <el-table-column             
+                  label="预计负债本息和">
+                  <template slot-scope="scope">
+                          <el-input size="small" v-model="scope.row.consumerAddress" placeholder="请输入内容" :disabled="scope.row.disable"></el-input> 
+                  </template>
+                </el-table-column>    
+                <el-table-column label="操作">
+                  <template slot-scope="scope">
+                    <el-button
+                      size="mini"
+                      @click="handleEdit(scope.$index, scope.row)" v-if="scope.row.disable">编辑</el-button>
+                      <el-button
+                      size="mini"
+                      @click="handleSave(scope.$index, scope.row)" v-if="!scope.row.disable" type="primary">保存</el-button>
+                    <el-button
+                      size="mini"
+                      type="danger"
+                      @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                  </template>
+                </el-table-column>
+                </el-table>
             </el-tab-pane>
-            <el-tab-pane label="图表展示页面" name="second">图表展示页面</el-tab-pane>
+            <el-tab-pane label="图表展示页面" name="third">全面分析负债盈利等情况</el-tab-pane>
               </el-tabs>
         
         </div>
@@ -304,42 +366,7 @@
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item> 图表展示</el-breadcrumb-item>
           </el-breadcrumb>
-          <el-table
-          :data="tableData"
-          style="width: 100%">
-          <el-table-column
-            label="日期"
-            width="180">
-            <template slot-scope="scope">
-              <i class="el-icon-time"></i>
-              <span style="margin-left: 10px">{{ scope.row.date }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column
-            label="姓名"
-            width="180">
-            <template slot-scope="scope">
-              <el-popover trigger="hover" placement="top">
-                <p>姓名: {{ scope.row.name }}</p>
-                <p>住址: {{ scope.row.address }}</p>
-                <div slot="reference" class="name-wrapper">
-                  <el-tag size="medium">{{ scope.row.name }}</el-tag>
-                </div>
-              </el-popover>
-            </template>
-          </el-table-column>
-          <el-table-column label="操作">
-            <template slot-scope="scope">
-              <el-button
-                size="mini"
-                @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-              <el-button
-                size="mini"
-                type="danger"
-                @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+         敬请期待
         </div>
     </el-main>
   </el-container>
@@ -426,57 +453,94 @@
         tableData3: [{
             date: '2016-05-02',
             name: '王小虎',
-            pasword:'密码',
+           
             money: '上海市普陀区金沙江路 1518 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
           }, {
             date: '2016-05-04',
             name: '王小虎',
-            pasword:'密码',
+            
             money: '上海市普陀区金沙江路 1517 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
           }, {
             date: '2016-05-01',
             name: '王小虎',
-            pasword:'密码',
+           
             money: '上海市普陀区金沙江路 1519 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
           }, {
             date: '2016-05-03',
             name: '王小虎',
-            pasword:'密码',
+            
             money: '上海市普陀区金沙江路 1516 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
         }],
         tableData4: [{
-            date: '2016-05-02',
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
             name: '王小虎',
-            pasword:'密码',
+            
             address: '上海市普陀区金沙江路 1518 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
           }, {
-            date: '2016-05-04',
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
             name: '王小虎',
-            pasword:'密码',
+           
             address: '上海市普陀区金沙江路 1517 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
           }, {
-            date: '2016-05-01',
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
             name: '王小虎',
-            pasword:'密码',
+          
             address: '上海市普陀区金沙江路 1519 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
           }, {
-            date: '2016-05-03',
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
             name: '王小虎',
-            pasword:'密码',
+           
+            address: '上海市普陀区金沙江路 1516 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+        }],
+        tableData5: [{
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
+            name: '王小虎',
+           
+            address: '上海市普陀区金沙江路 1518 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
+            name: '王小虎',
+            
+            address: '上海市普陀区金沙江路 1517 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
+            name: '王小虎',
+       
+            address: '上海市普陀区金沙江路 1519 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:true
+          }, {
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
+            name: '王小虎',
+           
             address: '上海市普陀区金沙江路 1516 弄',
             consumerAddress:"上海市普陀区金沙江路 1518 弄",
             disable:true
@@ -484,6 +548,65 @@
       };
     },
     methods: {
+      incomeAdd(item){
+        var tableDataTemp=[];      
+        if(item==1){
+          tableDataTemp.push({
+              date: '2016-05-02',
+              name: '王小虎',
+              source: '00000',
+              money:"bruobuqi",
+              disable:false
+          });
+          this.tableData2.forEach(element => {
+            tableDataTemp.push(element);
+          });
+        this.tableData2=tableDataTemp;}
+        if(item==2){
+          tableDataTemp.push({
+             date: '2016-05-02',
+            name: '王小虎',
+            pasword:'密码',
+            money: '上海市普陀区金沙江路 1518 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:false
+          });
+          this.tableData3.forEach(element => {
+            tableDataTemp.push(element);
+          });
+        this.tableData3=tableDataTemp;}
+         if(item==3){
+          tableDataTemp.push({
+            dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1517 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:false
+          });
+          this.tableData4.forEach(element => {
+            tableDataTemp.push(element);
+          });
+        this.tableData4=tableDataTemp;}
+        if(item==4){
+          tableDataTemp.push({
+             dateStart: '2016-05-02',
+            dateEnd: '2016-05-02',
+            name: '王小虎',
+            pasword:'密码',
+            address: '上海市普陀区金沙江路 1517 弄',
+            consumerAddress:"上海市普陀区金沙江路 1518 弄",
+            disable:false
+          });
+          this.tableData5.forEach(element => {
+            tableDataTemp.push(element);
+          });
+        this.tableData5=tableDataTemp;}
+      },
+      handleClick(tab, event) {
+        console.log(tab, event);
+      },
       handleEdit(index, row) {
         if(this.changetable=="1"){
          this.tableData1[index].disable=false;
@@ -587,6 +710,10 @@
   }
 </script>
 <style scoped>
+.el-button.is-round {
+    margin-left: -92%;
+    margin-top: 1%;
+}
 .el-main[data-v-469af010] {
     text-align: center;
     line-height: 20px;

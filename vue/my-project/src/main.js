@@ -5,6 +5,11 @@ import App from './App'
 import router from './router'
 import ElementUI from 'element-ui' //element-ui的全部组件
 import 'element-ui/lib/theme-chalk/index.css'//element-ui的css
+import axios from 'axios'
+import qs from 'qs';
+
+Vue.prototype.$qs = qs;
+Vue.prototype.$axios = axios;
 Vue.config.productionTip = false
 Vue.use(ElementUI)
 /* eslint-disable no-new */
