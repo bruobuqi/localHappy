@@ -547,6 +547,9 @@
         }],
       };
     },
+     mounted() {
+      console.log(this.$route.params) ;
+    },
     methods: {
       incomeAdd(item){
         var tableDataTemp=[];      
